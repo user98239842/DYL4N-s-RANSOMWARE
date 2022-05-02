@@ -2,7 +2,7 @@ import asyncio
 from tkinter import Tk, Entry, Label
 from psutil import process_iter
 from keyboard import block_key
-from label import second_text
+from label import main_text second_text
 
 
 root = Tk()
